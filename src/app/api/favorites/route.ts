@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '../auth/[...nextauth]/route';
-import { supabase } from '@/lib/supabase';
+import { supabaseAdmin } from '@/lib/supabaseAdmin';
 
 // GET favoritos
 export async function GET() {
@@ -11,7 +11,7 @@ export async function GET() {
     return NextResponse.json({ error: 'No autorizado' }, { status: 401 });
   }
 
-  const { data, error } = await supabase.from('favorites').select('*').eq('user_id', session.user.id);
+  const { data, error } = await supabaseAdmin.from('favorites').select('*').eq('user_id', session.user.id);
 
   if (error) {
     return NextResponse.json({ error }, { status: 500 });
@@ -35,7 +35,7 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: 'property_id inválido' }, { status: 400 });
   }
 
-  const { error } = await supabase.from('favorites').insert({
+  const { error } = await supabaseAdmin.from('favorites').insert({
     user_id: session.user.id,
     property_id,
   });
@@ -67,7 +67,7 @@ export async function DELETE(req: Request) {
     return NextResponse.json({ error: 'property_id inválido' }, { status: 400 });
   }
 
-  const { error } = await supabase.from('favorites').delete().eq('user_id', session.user.id).eq('property_id', property_id);
+  const { error } = await supabaseAdmin.from('favorites').delete().eq('user_id', session.user.id).eq('property_id', property_id);
 
   if (error) {
     return NextResponse.json({ error }, { status: 500 });

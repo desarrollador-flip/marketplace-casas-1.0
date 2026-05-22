@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 
 import { authOptions } from '../auth/[...nextauth]/route';
-import { supabase } from '@/lib/supabase';
+import { supabaseAdmin } from '@/lib/supabaseAdmin';
 
 export async function GET() {
   try {
@@ -12,7 +12,11 @@ export async function GET() {
       return NextResponse.json({ error: 'No autorizado' }, { status: 401 });
     }
 
-    const { data, error } = await supabase.from('properties').select('*').eq('user_id', session.user.id).order('created_at', { ascending: false });
+    const { data, error } = await supabaseAdmin
+      .from('properties')
+      .select('*')
+      .eq('user_id', session.user.id)
+      .order('created_at', { ascending: false });
 
     if (error) {
       return NextResponse.json({ error }, { status: 500 });

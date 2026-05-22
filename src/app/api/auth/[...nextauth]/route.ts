@@ -1,6 +1,6 @@
 import NextAuth from 'next-auth';
 import GoogleProvider from 'next-auth/providers/google';
-import { supabase } from '@/lib/supabase';
+import { supabaseAdmin } from '@/lib/supabaseAdmin';
 import { NextAuthOptions } from 'next-auth';
 
 export const authOptions: NextAuthOptions = {
@@ -23,7 +23,7 @@ export const authOptions: NextAuthOptions = {
       if (!provider || !providerId) return false;
 
       // 1. buscar account
-      const { data: existingAccount, error } = await supabase
+      const { data: existingAccount, error } = await supabaseAdmin
         .from('accounts')
         .select('*')
         .eq('provider', provider)
@@ -43,7 +43,7 @@ export const authOptions: NextAuthOptions = {
       }
 
       // 2. crear user
-      const { data: newUser, error: userError } = await supabase
+      const { data: newUser, error: userError } = await supabaseAdmin
         .from('users')
         .insert([
           {
@@ -64,7 +64,7 @@ export const authOptions: NextAuthOptions = {
       console.log('INSERT ERROR:', userError);
 
       // 3. crear account
-      const { error: accountError } = await supabase.from('accounts').insert([
+      const { error: accountError } = await supabaseAdmin.from('accounts').insert([
         {
           user_id: newUser.id,
           provider,
@@ -76,7 +76,7 @@ export const authOptions: NextAuthOptions = {
         console.error(accountError);
 
         // borrar el usuario
-        await supabase.from('users').delete().eq('id', newUser.id);
+        await supabaseAdmin.from('users').delete().eq('id', newUser.id);
 
         return false;
       }
@@ -89,7 +89,7 @@ export const authOptions: NextAuthOptions = {
         const provider = account.provider;
         const providerId = account.providerAccountId;
 
-        const { data } = await supabase.from('accounts').select('user_id').eq('provider', provider).eq('provider_id', providerId).single();
+        const { data } = await supabaseAdmin.from('accounts').select('user_id').eq('provider', provider).eq('provider_id', providerId).single();
 
         token.userId = data?.user_id;
       }

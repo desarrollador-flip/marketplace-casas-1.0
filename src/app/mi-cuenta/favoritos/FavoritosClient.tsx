@@ -4,7 +4,7 @@ import { useFavorites } from '@/hooks/useFavorites';
 import { useProperties } from '@/hooks/useProperties';
 
 export default function FavoritosClient() {
-  const { favorites, loading: favoritesLoading } = useFavorites();
+  const { favorites, loading: favoritesLoading, loading, saving, isFavorite, toggleFavorite } = useFavorites();
 
   const { properties, loading: propertiesLoading } = useProperties(favorites);
 
@@ -24,6 +24,10 @@ export default function FavoritosClient() {
             <h3>{prop.title}</h3>
 
             <p>${prop.price}</p>
+
+            <button onClick={() => toggleFavorite(prop.id)} disabled={loading || saving === prop.id}>
+              {isFavorite(prop.id) ? '⭐' : '☆'}
+            </button>
           </div>
         ))
       )}
